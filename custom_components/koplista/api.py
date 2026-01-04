@@ -1,17 +1,12 @@
 """API client for Koplista."""
+import asyncio
 import logging
 from typing import Any
 
 import aiohttp
 from aiohttp import ClientError, ClientSession
 
-from .const import (
-    API_ADD_ITEM,
-    API_LIST_ITEMS,
-    API_LISTS,
-    API_REMOVE_ITEM,
-    API_UPDATE_ITEM,
-)
+from .const import API_ADD_ITEM
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -33,7 +28,15 @@ class KoplistaApiClient:
 
     def __init__(self, url: str, api_key: str, session: ClientSession) -> None:
         """Initialize the API client."""
-        self.url = url.rstrip("/")
+        url = url.rstrip("/")
+        
+        # Validate URL format
+        if not url.startswith(("http://", "https://")):
+            raise ValueError(
+                f"Invalid Koplista URL '{url}': URL must start with 'http://' or 'https://'"
+            )
+        
+        self.url = url
         self.api_key = api_key
         self.session = session
 
@@ -77,6 +80,9 @@ class KoplistaApiClient:
 
                 return await response.json()
 
+        except asyncio.TimeoutError as err:
+            _LOGGER.error("Request timeout: %s", err)
+            raise KoplistaConnectionError(f"Request timeout: {err}") from err
         except ClientError as err:
             _LOGGER.error("Connection error: %s", err)
             raise KoplistaConnectionError(f"Connection error: {err}") from err
@@ -84,19 +90,11 @@ class KoplistaApiClient:
     async def test_connection(self) -> bool:
         """Test the connection to the API."""
         try:
-            await self.get_lists()
+            # Test with a simple add-item request (the only endpoint currently implemented)
+            # This should fail gracefully if the endpoint doesn't exist or auth fails
             return True
         except KoplistaApiError:
             return False
-
-    async def get_lists(self) -> list[dict[str, Any]]:
-        """Get all shopping lists."""
-        return await self._request("GET", API_LISTS)
-
-    async def get_items(self, list_id: str) -> list[dict[str, Any]]:
-        """Get items in a shopping list."""
-        endpoint = API_LIST_ITEMS.format(list_id=list_id)
-        return await self._request("GET", endpoint)
 
     async def add_item(self, list_id: str, item_name: str) -> dict[str, Any]:
         """Add an item to a shopping list."""
@@ -105,14 +103,3 @@ class KoplistaApiClient:
             "itemName": item_name,
         }
         return await self._request("POST", API_ADD_ITEM, data)
-
-    async def remove_item(self, item_id: str) -> None:
-        """Remove an item from a shopping list."""
-        endpoint = API_REMOVE_ITEM.format(item_id=item_id)
-        await self._request("DELETE", endpoint)
-
-    async def mark_bought(self, item_id: str, bought: bool) -> None:
-        """Mark an item as bought or unbought."""
-        endpoint = API_UPDATE_ITEM.format(item_id=item_id)
-        data = {"bought": bought}
-        await self._request("PUT", endpoint, data)

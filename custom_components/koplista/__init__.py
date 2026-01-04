@@ -2,17 +2,14 @@
 import logging
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_API_KEY, Platform
+from homeassistant.const import CONF_API_KEY, CONF_URL
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .api import KoplistaApiClient
-from .const import CONF_URL, DOMAIN
-from .coordinator import KoplistaDataUpdateCoordinator
+from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
-
-PLATFORMS = [Platform.TODO]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -26,22 +23,18 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         session,
     )
 
-    coordinator = KoplistaDataUpdateCoordinator(hass, client)
-    await coordinator.async_config_entry_first_refresh()
-
     hass.data[DOMAIN][entry.entry_id] = {
         "client": client,
-        "coordinator": coordinator,
     }
 
-    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+    # Register services only once (for the first entry)
+    if not hass.services.has_service(DOMAIN, "add_item"):
+        from .services import async_setup_services
 
-    # Register services
-    from .services import async_setup_services
+        await async_setup_services(hass)
 
-    await async_setup_services(hass)
-
-    # Register intents
+    # Register intents only once (for the first entry)
+    # Note: intent.async_register will not re-register if already registered
     from .intent import async_setup_intents
 
     async_setup_intents(hass)
@@ -51,7 +44,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
-    if unload_ok := await hass.config_entries.async_unload_platforms(entry, PLATFORMS):
-        hass.data[DOMAIN].pop(entry.entry_id)
+    hass.data[DOMAIN].pop(entry.entry_id)
+    
+    # Unregister services if this is the last entry
+    remaining_entries = [
+        e for e in hass.config_entries.async_entries(DOMAIN) if e.entry_id != entry.entry_id
+    ]
+    if not remaining_entries:
+        from .const import SERVICE_ADD_ITEM
+        
+        hass.services.async_remove(DOMAIN, SERVICE_ADD_ITEM)
 
-    return unload_ok
+    return True

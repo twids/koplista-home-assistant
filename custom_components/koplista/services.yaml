@@ -2,33 +2,16 @@ add_item:
   name: Add Item
   description: Add an item to a Koplista shopping list
   fields:
-    list_name:
-      name: List Name
-      description: Name of the shopping list (optional, uses default if not specified)
-      example: "Inköpslista"
+    list_id:
+      name: List ID
+      description: ID of the shopping list (defaults to "default" if not specified)
+      required: false
+      example: "default"
       selector:
         text:
     item:
       name: Item
       description: Name of the item to add
-      required: true
-      example: "Mjölk"
-      selector:
-        text:
-
-remove_item:
-  name: Remove Item
-  description: Remove an item from a Koplista shopping list
-  fields:
-    list_name:
-      name: List Name
-      description: Name of the shopping list
-      example: "Inköpslista"
-      selector:
-        text:
-    item:
-      name: Item
-      description: Name of the item to remove
       required: true
       example: "Mjölk"
       selector:

@@ -3,14 +3,15 @@ import logging
 from typing import Any
 
 import voluptuous as vol
+from aiohttp import ClientError
 from homeassistant import config_entries
-from homeassistant.const import CONF_API_KEY
+from homeassistant.const import CONF_API_KEY, CONF_URL
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
-from .api import KoplistaApiClient, KoplistaApiError
-from .const import CONF_URL, DOMAIN
+from .api import KoplistaApiClient, KoplistaApiError, KoplistaConnectionError
+from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -47,8 +48,14 @@ class KoplistaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             try:
                 info = await validate_input(self.hass, user_input)
-            except KoplistaApiError:
+            except (KoplistaApiError, KoplistaConnectionError):
                 errors["base"] = "cannot_connect"
+            except ClientError:
+                _LOGGER.exception("Connection error")
+                errors["base"] = "cannot_connect"
+            except ValueError as err:
+                _LOGGER.error("Invalid configuration: %s", err)
+                errors["base"] = "invalid_url"
             except Exception:  # pylint: disable=broad-except
                 _LOGGER.exception("Unexpected exception")
                 errors["base"] = "unknown"
@@ -70,8 +77,14 @@ class KoplistaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             try:
                 await validate_input(self.hass, user_input)
-            except KoplistaApiError:
+            except (KoplistaApiError, KoplistaConnectionError):
                 errors["base"] = "cannot_connect"
+            except ClientError:
+                _LOGGER.exception("Connection error")
+                errors["base"] = "cannot_connect"
+            except ValueError as err:
+                _LOGGER.error("Invalid configuration: %s", err)
+                errors["base"] = "invalid_url"
             except Exception:  # pylint: disable=broad-except
                 _LOGGER.exception("Unexpected exception")
                 errors["base"] = "unknown"
