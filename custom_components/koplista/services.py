@@ -31,7 +31,11 @@ async def async_setup_services(hass: HomeAssistant) -> None:
     async def async_add_item(call: ServiceCall) -> None:
         """Handle add item service call."""
         list_name = call.data.get("list_name")
-        item_name = call.data["item"]
+        item_name = call.data.get("item")
+        
+        if not item_name:
+            _LOGGER.error("Item name is required")
+            return
 
         # Get the first entry (assumes single integration instance)
         entries = hass.config_entries.async_entries(DOMAIN)
@@ -65,7 +69,11 @@ async def async_setup_services(hass: HomeAssistant) -> None:
     async def async_remove_item(call: ServiceCall) -> None:
         """Handle remove item service call."""
         list_name = call.data.get("list_name")
-        item_name = call.data["item"]
+        item_name = call.data.get("item")
+        
+        if not item_name:
+            _LOGGER.error("Item name is required")
+            return
 
         # Get the first entry (assumes single integration instance)
         entries = hass.config_entries.async_entries(DOMAIN)

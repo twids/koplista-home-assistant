@@ -73,6 +73,10 @@ class KoplistaTodoList(CoordinatorEntity, TodoListEntity):
         items = []
 
         for item in items_data:
+            # Skip items with missing required fields
+            if not item.get("id") or not item.get("name"):
+                continue
+                
             status = (
                 TodoItemStatus.COMPLETED
                 if item.get("bought", False)
