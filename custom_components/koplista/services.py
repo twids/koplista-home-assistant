@@ -47,13 +47,9 @@ async def async_setup_services(hass: HomeAssistant) -> None:
         list_id = None
         if list_name:
             for lid, list_data in coordinator.data.items():
-                try:
-                    if list_data.get("info", {}).get("name", "").lower() == list_name.lower():
-                        list_id = lid
-                        break
-                except (KeyError, AttributeError):
-                    _LOGGER.warning("Invalid data structure for list %s", lid)
-                    continue
+                if list_data.get("info", {}).get("name", "").lower() == list_name.lower():
+                    list_id = lid
+                    break
         else:
             # Use the first list as default
             list_id = next(iter(coordinator.data.keys()), None)
@@ -85,29 +81,21 @@ async def async_setup_services(hass: HomeAssistant) -> None:
         item_id = None
         if list_name:
             for lid, list_data in coordinator.data.items():
-                try:
-                    if list_data.get("info", {}).get("name", "").lower() == list_name.lower():
-                        for item in list_data.get("items", []):
-                            if item.get("name", "").lower() == item_name.lower():
-                                item_id = item.get("id")
-                                break
-                        break
-                except (KeyError, AttributeError):
-                    _LOGGER.warning("Invalid data structure for list %s", lid)
-                    continue
-        else:
-            # Search all lists
-            for list_data in coordinator.data.values():
-                try:
+                if list_data.get("info", {}).get("name", "").lower() == list_name.lower():
                     for item in list_data.get("items", []):
                         if item.get("name", "").lower() == item_name.lower():
                             item_id = item.get("id")
                             break
-                    if item_id:
+                    break
+        else:
+            # Search all lists
+            for list_data in coordinator.data.values():
+                for item in list_data.get("items", []):
+                    if item.get("name", "").lower() == item_name.lower():
+                        item_id = item.get("id")
                         break
-                except (KeyError, AttributeError):
-                    _LOGGER.warning("Invalid data structure in list data")
-                    continue
+                if item_id:
+                    break
 
         if item_id is None:
             _LOGGER.error("Item not found: %s", item_name)

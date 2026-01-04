@@ -61,13 +61,15 @@ class KoplistaTodoList(CoordinatorEntity, TodoListEntity):
     @property
     def name(self) -> str:
         """Return the name of the todo list."""
-        list_info = self.coordinator.data[self._list_id]["info"]
+        list_data = self.coordinator.data.get(self._list_id, {})
+        list_info = list_data.get("info", {})
         return f"Koplista {list_info.get('name', 'Shopping List')}"
 
     @property
     def todo_items(self) -> list[TodoItem]:
         """Return the todo items."""
-        items_data = self.coordinator.data[self._list_id]["items"]
+        list_data = self.coordinator.data.get(self._list_id, {})
+        items_data = list_data.get("items", [])
         items = []
 
         for item in items_data:
