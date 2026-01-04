@@ -1,0 +1,1 @@
+# koplista-home-assistant
