@@ -1,0 +1,46 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Anslut till Koplista",
+        "description": "Ange dina Koplista-instansuppgifter",
+        "data": {
+          "url": "Koplista URL",
+          "api_key": "API-nyckel"
+        }
+      },
+      "reconfigure": {
+        "title": "Konfigurera om Koplista",
+        "description": "Uppdatera dina Koplista-instansuppgifter",
+        "data": {
+          "url": "Koplista URL",
+          "api_key": "API-nyckel"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Det gick inte att ansluta till Koplista. Kontrollera din URL och API-nyckel.",
+      "invalid_url": "Ogiltig URL. URL måste börja med 'http://' eller 'https://'.",
+      "unknown": "Ett oväntat fel uppstod. Försök igen."
+    },
+    "abort": {
+      "reconfigure_successful": "Omkonfigurering lyckades"
+    }
+  },
+  "services": {
+    "add_item": {
+      "name": "Lägg till vara",
+      "description": "Lägg till en vara till en Koplista-inköpslista",
+      "fields": {
+        "list_id": {
+          "name": "List-ID",
+          "description": "ID för inköpslistan (standard är 'default' om inget anges)"
+        },
+        "item": {
+          "name": "Vara",
+          "description": "Namnet på varan att lägga till"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to Koplista",
+        "description": "Enter your Koplista instance details",
+        "data": {
+          "url": "Koplista URL",
+          "api_key": "API Key"
+        }
+      },
+      "reconfigure": {
+        "title": "Reconfigure Koplista",
+        "description": "Update your Koplista instance details",
+        "data": {
+          "url": "Koplista URL",
+          "api_key": "API Key"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to Koplista. Please check your URL and API key.",
+      "unknown": "An unexpected error occurred. Please try again."
+    },
+    "abort": {
+      "reconfigure_successful": "Reconfiguration successful"
+    }
+  },
+  "services": {
+    "add_item": {
+      "name": "Add Item",
+      "description": "Add an item to a Koplista shopping list",
+      "fields": {
+        "list_id": {
+          "name": "List ID",
+          "description": "ID of the shopping list (defaults to 'default' if not specified)"
+        },
+        "item": {
+          "name": "Item",
+          "description": "Name of the item to add"
+        }
+      }
+    }
+  }
+}
