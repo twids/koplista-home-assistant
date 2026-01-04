@@ -4,15 +4,18 @@
 [![GitHub release](https://img.shields.io/github/release/twids/koplista-home-assistant.svg)](https://github.com/twids/koplista-home-assistant/releases)
 [![License](https://img.shields.io/github/license/twids/koplista-home-assistant.svg)](LICENSE)
 
-A Home Assistant integration for [Koplista](https://github.com/twids/k-plista), a grocery list application. This integration allows you to manage your Koplista shopping lists directly from Home Assistant and use voice commands via Google Home to add items to your lists.
+A Home Assistant integration for [Koplista](https://github.com/twids/k-plista), a grocery list application. This integration allows you to add items to your Koplista shopping lists using voice commands via Google Home or Home Assistant services.
 
 ## Features
 
-- 🛒 **Shopping List Management**: View and manage your Koplista shopping lists as Todo entities in Home Assistant
 - 🗣️ **Voice Commands**: Add items using voice commands like "Lägg till mjölk på köplistan" (Swedish) or "Add milk to the shopping list" (English)
-- 🔄 **Real-time Sync**: Automatic polling to keep your lists up to date
-- 🎛️ **Services**: Use Home Assistant services to add/remove items programmatically
+- 🎛️ **Services**: Use Home Assistant services to add items programmatically
 - 🌐 **Multi-language**: Support for Swedish and English
+- 🔐 **Secure**: API key authentication
+
+## Current Limitations
+
+**Note**: The Koplista API currently only supports adding items. Features like viewing lists, removing items, and marking items as bought require additional API endpoints that are not yet implemented. This integration will be expanded as more API endpoints become available.
 
 ## Prerequisites
 
@@ -45,24 +48,13 @@ A Home Assistant integration for [Koplista](https://github.com/twids/k-plista), 
 2. Click **Add Integration**
 3. Search for "Koplista"
 4. Enter your Koplista configuration:
-   - **URL**: Your Koplista instance URL (e.g., `https://koplista.example.com`)
+   - **URL**: Your Koplista instance URL (must start with `http://` or `https://`, e.g., `https://koplista.example.com`)
    - **API Key**: Your personal API key from Koplista
 5. Click **Submit**
 
-The integration will validate your connection and create Todo entities for each of your shopping lists.
+The integration will validate your connection.
 
 ## Usage
-
-### Todo Entities
-
-After configuration, you'll see Todo entities for each of your Koplista shopping lists:
-- `todo.koplista_[list_name]`
-
-You can:
-- View items in the Home Assistant Todo card
-- Add new items
-- Mark items as bought (complete)
-- Remove items
 
 ### Voice Commands
 
@@ -86,31 +78,23 @@ The integration provides the following services:
 
 Add an item to a Koplista shopping list.
 
+### Services
+
+The integration provides the following service:
+
+#### `koplista.add_item`
+
+Add an item to a Koplista shopping list.
+
 **Parameters:**
-- `list_name` (optional): Name of the shopping list (uses default if not specified)
+- `list_id` (optional): ID of the shopping list (defaults to "default" if not specified)
 - `item` (required): Name of the item to add
 
 **Example:**
 ```yaml
 service: koplista.add_item
 data:
-  list_name: "Inköpslista"
-  item: "Mjölk"
-```
-
-#### `koplista.remove_item`
-
-Remove an item from a Koplista shopping list.
-
-**Parameters:**
-- `list_name` (optional): Name of the shopping list
-- `item` (required): Name of the item to remove
-
-**Example:**
-```yaml
-service: koplista.remove_item
-data:
-  list_name: "Inköpslista"
+  list_id: "default"
   item: "Mjölk"
 ```
 
@@ -119,7 +103,7 @@ data:
 ### Connection Issues
 
 If the integration fails to connect:
-1. Verify your Koplista instance URL is correct and accessible
+1. Verify your Koplista instance URL is correct and accessible (must start with `http://` or `https://`)
 2. Check that your API key is valid
 3. Ensure your Koplista instance has API key support enabled
 4. Check Home Assistant logs for detailed error messages
@@ -130,25 +114,16 @@ If the integration fails to connect:
 2. Configure your voice assistant (Google Home, Alexa, etc.) with Home Assistant
 3. Check that the intent handlers are registered in the Home Assistant logs
 
-### Items Not Syncing
-
-The integration polls for updates every 30 seconds. If items aren't syncing:
-1. Check your network connection
-2. Verify the API key hasn't expired
-3. Check Home Assistant logs for API errors
-
 ## Development
 
 ### API Endpoints
 
-The integration uses the following Koplista API endpoints:
-- `GET /api/external/lists` - Fetch all lists
-- `GET /api/external/lists/{id}/items` - Fetch items in a list
-- `POST /api/external/add-item` - Add an item
-- `DELETE /api/external/items/{id}` - Remove an item
-- `PUT /api/external/items/{id}/bought` - Mark item as bought/unbought
+The integration currently uses the following Koplista API endpoint:
+- `POST /api/external/add-item` - Add an item (with `listId` and `itemName` in request body)
 
 All requests require the `X-API-Key` header.
+
+**Note**: Additional endpoints for fetching lists, viewing items, and removing items are planned for future implementation in the Koplista API. This integration will be expanded once those endpoints are available.
 
 ## Contributing
 
