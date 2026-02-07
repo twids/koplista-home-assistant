@@ -23,7 +23,7 @@
       "unknown": "An unexpected error occurred. Please try again."
     },
     "abort": {
-      "reconfigure_successful": "Reconfiguration successful"
+      "reconfigure_successful": "Configuration updated. Please reload the integration for changes to take effect."
     }
   },
   "services": {
@@ -47,6 +47,7 @@
       "data": [
         {
           "sentences": [
+            "add {item}",
             "add {item} to koplista",
             "add {item} to the shopping list",
             "add {item} to my shopping list",

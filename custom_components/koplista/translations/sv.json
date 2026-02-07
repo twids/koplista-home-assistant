@@ -24,7 +24,7 @@
       "unknown": "Ett oväntat fel uppstod. Försök igen."
     },
     "abort": {
-      "reconfigure_successful": "Omkonfigurering lyckades"
+      "reconfigure_successful": "Konfiguration uppdaterad. Vänligen ladda om integrationen för att tillämpa ändringarna."
     }
   },
   "services": {
@@ -48,10 +48,15 @@
       "data": [
         {
           "sentences": [
-            "lägg till {item} på köplista",
+            "lägg till {item}",
+            "lägg till {item} på koplistan",
+            "lägg till {item} på köplistan",
             "lägg till {item} på inköpslistan",
             "lägg till {item} på listan",
-            "lägg {item} på köplista",
+            "lägg {item} på koplistan",
+            "lägg {item} på köplistan",
+            "sätt {item} på koplistan",
+            "sätt {item} på köplistan",
             "sätt {item} på inköpslistan"
           ]
         }

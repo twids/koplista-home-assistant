@@ -56,8 +56,8 @@ class KoplistaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             except ValueError as err:
                 _LOGGER.error("Invalid configuration: %s", err)
                 errors["base"] = "invalid_url"
-            except Exception:  # pylint: disable=broad-except
-                _LOGGER.exception("Unexpected exception")
+            except Exception as err:  # pylint: disable=broad-except
+                _LOGGER.exception("Unexpected exception during setup: %s", err)
                 errors["base"] = "unknown"
             else:
                 return self.async_create_entry(title=info["title"], data=user_input)
@@ -85,8 +85,8 @@ class KoplistaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             except ValueError as err:
                 _LOGGER.error("Invalid configuration: %s", err)
                 errors["base"] = "invalid_url"
-            except Exception:  # pylint: disable=broad-except
-                _LOGGER.exception("Unexpected exception")
+            except Exception as err:  # pylint: disable=broad-except
+                _LOGGER.exception("Unexpected exception during reconfiguration: %s", err)
                 errors["base"] = "unknown"
             else:
                 entry = self.hass.config_entries.async_get_entry(
@@ -94,8 +94,7 @@ class KoplistaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 )
                 if entry:
                     self.hass.config_entries.async_update_entry(entry, data=user_input)
-                    await self.hass.config_entries.async_reload(entry.entry_id)
-                    return self.async_abort(reason="reconfigure_successful")
+                return self.async_abort(reason="reconfigure_successful")
 
         return self.async_show_form(
             step_id="reconfigure",
