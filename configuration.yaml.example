@@ -4,14 +4,26 @@
 # REQUIRED: Voice command patterns for Koplista
 # Custom integrations cannot auto-register conversation sentences,
 # so you must add these manually to configuration.yaml
-conversation:
-  intents:
-    KoplistaAddItem:
-      - "lägg till {item} på koplista"
-      - "lägg till {item} till koplista"
-      - "köp {item}"
-      - "vi behöver {item}"
-      - "köp in {item}"
+
+# Use intent_script for voice commands (recommended approach)
+intent_script:
+  KoplistaAddItem:
+    speech:
+      text: "OK"
+    # The intent handler in the integration will be called automatically
+    # No action needed - handled by custom_components/koplista/intent.py
+
+# Alternative: Use conversation intents with wildcard (more flexible but experimental)
+# conversation:
+#   intents:
+#     KoplistaAddItem:
+#       data:
+#         - sentences:
+#             - "lägg till <item> på koplista"
+#             - "lägg till <item> till koplista" 
+#             - "köp <item>"
+#             - "vi behöver <item>"
+#             - "köp in <item>"
 
 # OPTIONAL: Disable built-in shopping list if you don't use it
 # This prevents conflicts if you prefer to say "köplistan" instead of "koplista"

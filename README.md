@@ -64,19 +64,18 @@ The integration will validate your connection.
 **Important:** Custom integrations cannot auto-register voice commands. You must add the following to your Home Assistant `configuration.yaml` file:
 
 ```yaml
-conversation:
-  intents:
-    KoplistaAddItem:
-      - "lägg till {item} på koplista"
-      - "lägg till {item} till koplista"
-      - "köp {item}"
-      - "vi behöver {item}"
-      - "köp in {item}"
+intent_script:
+  KoplistaAddItem:
+    speech:
+      text: "OK"
 ```
 
 After adding this configuration:
 1. Restart Home Assistant
 2. Voice commands will now work!
+3. Say: "Lägg till mjölk på koplista", "Köp bröd", etc.
+
+The integration's intent handler will automatically process these commands and respond in Swedish/English.
 
 See [configuration.yaml.example](configuration.yaml.example) for the complete configuration example.
 
@@ -144,15 +143,17 @@ After adding the configuration above, you can use voice commands like:
 
 **Swedish:**
 - "Lägg till mjölk på koplista"
-- "Köp bröd"
+- "Köp bröd" 
 - "Vi behöver ägg"
+- "Köp in kaffe"
 
 **English:**
 - "Add milk to koplista"
 - "Buy bread"
 - "We need eggs"
+- "Get coffee"
 
-**Note:** The phrase "på koplista" is used instead of "på köplistan" to avoid conflicts with Home Assistant's built-in shopping list.
+**How it works:** The intent handler in the integration automatically recognizes variations of these phrases and extracts the item name.
 
 ### Services
 

@@ -71,17 +71,19 @@ The integration will validate your connection.
 **Important:** Custom integrations cannot auto-register voice commands. You must add this to your `configuration.yaml`:
 
 ```yaml
-conversation:
-  intents:
-    KoplistaAddItem:
-      - "lägg till {item} på koplista"
-      - "lägg till {item} till koplista"
-      - "köp {item}"
-      - "vi behöver {item}"
-      - "köp in {item}"
+intent_script:
+  KoplistaAddItem:
+    speech:
+      text: "OK"
 ```
 
 **Restart Home Assistant** after adding this configuration.
+
+The integration will automatically handle these voice commands:
+- "Lägg till {item} på koplista"
+- "Köp {item}"
+- "Vi behöver {item}"
+- And more variations
 
 See [configuration.yaml.example](configuration.yaml.example) for the complete example.
 
