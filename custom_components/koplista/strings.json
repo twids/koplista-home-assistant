@@ -42,5 +42,20 @@
         }
       }
     }
+  },
+  "intents": {
+    "KoplistaAddItem": {
+      "data": [
+        {
+          "sentences": [
+            "add {item} to koplista",
+            "add {item} to the shopping list",
+            "add {item} to my shopping list",
+            "put {item} on koplista",
+            "put {item} on the shopping list"
+          ]
+        }
+      ]
+    }
   }
 }
