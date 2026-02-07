@@ -53,6 +53,8 @@ Before installing the Koplista Home Assistant integration, ensure you have:
 
 After installation and restart:
 
+### Step 1: Add Integration via UI
+
 1. Go to **Settings** → **Devices & Services**
 2. Click **+ Add Integration** (bottom right)
 3. Search for **"Koplista"**
@@ -62,11 +64,26 @@ After installation and restart:
    - **API Key**: Your API key from Koplista
 6. Click **Submit**
 
-The integration will:
-- Validate your connection
-- Create Todo entities for each of your shopping lists
-- Register voice command intents
-- Set up services for automation
+The integration will validate your connection.
+
+### Step 2: Enable Voice Commands ⚠️ REQUIRED
+
+**Important:** Custom integrations cannot auto-register voice commands. You must add this to your `configuration.yaml`:
+
+```yaml
+conversation:
+  intents:
+    KoplistaAddItem:
+      - "lägg till {item} på koplista"
+      - "lägg till {item} till koplista"
+      - "köp {item}"
+      - "vi behöver {item}"
+      - "köp in {item}"
+```
+
+**Restart Home Assistant** after adding this configuration.
+
+See [configuration.yaml.example](configuration.yaml.example) for the complete example.
 
 ## Verification
 
@@ -75,32 +92,43 @@ After successful configuration:
 1. Check **Settings** → **Devices & Services** → **Koplista**
 2. You should see:
    - Integration status: Connected
-   - Devices/Entities created for your shopping lists
-3. Go to **Settings** → **Entities**
-4. Filter by **"koplista"**
-5. You should see `todo.koplista_*` entities for each list
+3. Go to **Developer Tools** → **Services**
+4. Search for **"koplista.add_item"**
+5. Verify the service is available
 
-## Setting Up Voice Commands
+## Using Voice Commands
 
-### Google Home / Google Assistant
+### Home Assistant's Built-in Voice (Assist)
 
-1. Ensure your Home Assistant is connected to Google Assistant (via Nabu Casa or manual setup)
-2. Say: **"Hey Google, sync my devices"**
-3. Test the integration: **"Hey Google, lägg till mjölk på köplistan"** (Swedish) or **"Hey Google, add milk to the shopping list"** (English)
+Voice commands work immediately after completing the configuration steps:
 
-### Amazon Alexa
+1. Click the **microphone button** in Home Assistant
+2. Say: **"Lägg till mjölk på koplista"**
+3. Done!
 
-1. Ensure your Home Assistant is connected to Alexa
-2. Set up routines or use the shopping list skill
-3. Test with Alexa-compatible phrases
+### Google Home / Google Assistant (Requires Nabu Casa)
 
-### Home Assistant Voice Assistant
+**Note:** Standard Google Assistant integration does NOT support conversation routing. You need Nabu Casa Cloud.
 
-1. Enable **Assist** in Home Assistant
-2. Configure your preferred wake word
-3. Use the built-in sentence patterns:
-   - **Swedish**: "lägg till {item} på köplistan"
-   - **English**: "add {item} to the shopping list"
+1. **Subscribe** to [Nabu Casa](https://www.nabucasa.com/) ($6.50/month)
+2. **Enable Google Assistant**:
+   - **Settings** → **Home Assistant Cloud** → **Google Assistant**
+   - Complete OAuth flow
+3. **Test**: "Hey Google, lägg till mjölk på koplista"
+
+**Optional:** To avoid conflicts with HA's built-in shopping list:
+```yaml
+conversation:
+  intents:
+    HassShoppingListAddItem:
+      enabled: false
+```
+
+### Other Voice Assistants
+
+- **ESP32 satellites** (Atom Echo, S3-Box): Full support
+- **Wyoming protocol**: Full support  
+- **Alexa/Siri**: Use Home Assistant skills/shortcuts
 
 ## Troubleshooting
 
@@ -119,17 +147,18 @@ After successful configuration:
 
 ### Voice Commands Not Working
 
-- Verify the Conversation integration is enabled
-- Check that your voice assistant is properly connected to Home Assistant
-- Review Home Assistant logs for intent registration messages
-- Ensure your shopping lists exist in Koplista
+**Most common issue:** You haven't added the voice configuration to `configuration.yaml`.
 
-### Entities Not Showing
+1. Add the conversation intents to `configuration.yaml` (see Step 2 above)
+2. Restart Home Assistant  
+3. Test with: "Lägg till mjölk på koplista"
+4. Check logs for intent handler messages
 
-- Restart Home Assistant after configuration
-- Check that your Koplista instance has shopping lists created
-- Review the integration logs for errors
-- Try removing and re-adding the integration
+### Google Assistant Says "I don't understand"
+
+- Standard Google Assistant integration does NOT support conversation routing
+- You need **Nabu Casa Cloud** subscription for Google Home voice commands
+- Alternative: Use HA mobile app or ESP32 voice satellites
 
 ## Next Steps
 

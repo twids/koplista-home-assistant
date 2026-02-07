@@ -21,9 +21,14 @@ class AddItemIntentHandler(intent.IntentHandler):
         item_name = intent_obj.slots.get("item", {}).get("value")
         list_id = intent_obj.slots.get("list_id", {}).get("value", "default")
 
+        # Detect language from conversation agent (defaults to Swedish)
+        language = intent_obj.language or "sv"
+        is_swedish = language.startswith("sv")
+
         if not item_name:
             response = intent_obj.create_response()
-            response.async_set_speech("I didn't catch the item name")
+            speech = "Jag hörde inte vad som skulle läggas till" if is_swedish else "I didn't catch the item name"
+            response.async_set_speech(speech)
             return response
 
         # Get the first entry (assumes single integration instance)
@@ -31,7 +36,8 @@ class AddItemIntentHandler(intent.IntentHandler):
         entries = hass.config_entries.async_entries(DOMAIN)
         if not entries:
             response = intent_obj.create_response()
-            response.async_set_speech("Koplista integration is not configured")
+            speech = "Koplista är inte konfigurerad" if is_swedish else "Koplista integration is not configured"
+            response.async_set_speech(speech)
             return response
 
         entry = entries[0]
@@ -41,14 +47,22 @@ class AddItemIntentHandler(intent.IntentHandler):
             await client.add_item(list_id, item_name)
 
             response = intent_obj.create_response()
-            response.async_set_speech(f"Added {item_name} to the shopping list")
+            if is_swedish:
+                speech = f"Lagt till {item_name} på koplista"
+            else:
+                speech = f"Added {item_name} to the shopping list"
+            response.async_set_speech(speech)
             _LOGGER.info("Added item '%s' via intent", item_name)
             return response
 
         except (KoplistaApiError, KoplistaConnectionError) as err:
             _LOGGER.error("Error adding item via intent: %s", err)
             response = intent_obj.create_response()
-            response.async_set_speech(f"Failed to add {item_name} to the shopping list")
+            if is_swedish:
+                speech = f"Kunde inte lägga till {item_name} på koplista"
+            else:
+                speech = f"Failed to add {item_name} to the shopping list"
+            response.async_set_speech(speech)
             return response
 
 

@@ -1,4 +1,12 @@
-"""API client for Koplista."""
+"""API client for Koplista.
+
+This client implements communication with the Koplista API.
+
+Current API Limitations:
+    The Koplista API currently only implements the add-item endpoint.
+    Future endpoints for listing, updating, and removing items are planned
+    but not yet available.
+"""
 import asyncio
 import logging
 from typing import Any
@@ -88,16 +96,56 @@ class KoplistaApiClient:
             raise KoplistaConnectionError(f"Connection error: {err}") from err
 
     async def test_connection(self) -> bool:
-        """Test the connection to the API."""
+        """Test the connection to the API.
+        
+        Since the API only has add-item endpoint, we test by making a request
+        with invalid data and checking if we get a proper API response (not a connection error).
+        """
         try:
-            # Test with a simple add-item request (the only endpoint currently implemented)
-            # This should fail gracefully if the endpoint doesn't exist or auth fails
-            return True
-        except KoplistaApiError:
+            # Try a minimal request to verify API is accessible and auth works
+            # We expect this to fail validation but that proves the API is reachable
+            url = f"{self.url}{API_ADD_ITEM}"
+            headers = self._get_headers()
+            
+            async with self.session.request(
+                "POST",
+                url,
+                headers=headers,
+                json={},  # Empty data will fail validation but tests connectivity
+                timeout=aiohttp.ClientTimeout(total=10),
+            ) as response:
+                # Any response (even 400) means API is reachable
+                # 401 means auth failed (invalid API key)
+                # 404 means endpoint doesn't exist
+                if response.status == 401:
+                    return False
+                if response.status == 404:
+                    return False
+                # 400 or any other status means API is accessible
+                return True
+                
+        except (asyncio.TimeoutError, ClientError):
+            # Connection failed
+            return False
+        except Exception:  # pylint: disable=broad-except
+            # Any other error means connection failed
             return False
 
     async def add_item(self, list_id: str, item_name: str) -> dict[str, Any]:
-        """Add an item to a shopping list."""
+        """Add an item to a shopping list.
+        
+        Args:
+            list_id: The ID of the shopping list (typically "default")
+            item_name: The name of the item to add
+            
+        Returns:
+            API response dictionary
+            
+        Raises:
+            KoplistaAuthError: If API key is invalid (401)
+            KoplistaApiError: If API request fails
+            KoplistaConnectionError: If connection fails
+        """
         data = {
             "listId": list_id,
             "itemName": item_name,

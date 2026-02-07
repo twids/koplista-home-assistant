@@ -1,0 +1,24 @@
+# Example Home Assistant configuration for Koplista integration
+# Add this to your configuration.yaml file
+
+# REQUIRED: Voice command patterns for Koplista
+# Custom integrations cannot auto-register conversation sentences,
+# so you must add these manually to configuration.yaml
+conversation:
+  intents:
+    KoplistaAddItem:
+      - "lägg till {item} på koplista"
+      - "lägg till {item} till koplista"
+      - "köp {item}"
+      - "vi behöver {item}"
+      - "köp in {item}"
+
+# OPTIONAL: Disable built-in shopping list if you don't use it
+# This prevents conflicts if you prefer to say "köplistan" instead of "koplista"
+#conversation:
+#  intents:
+#    HassShoppingListAddItem:
+#      enabled: false
+
+# The Koplista integration itself is configured via the UI
+# Go to Settings → Devices & Services → Add Integration → Koplista

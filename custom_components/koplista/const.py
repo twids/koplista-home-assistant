@@ -2,15 +2,13 @@
 
 DOMAIN = "koplista"
 
-# Configuration
-CONF_API_KEY = "api_key"
-
 # Default values
 DEFAULT_NAME = "Koplista"
-DEFAULT_SCAN_INTERVAL = 30  # seconds
 
 # API endpoints
-# Note: Only the add-item endpoint is currently implemented in the Koplista API
+# Current API Limitations:
+# The Koplista API currently only supports adding items via the add-item endpoint.
+# Future endpoints for fetching, updating, and deleting items are planned but not yet implemented.
 API_ADD_ITEM = "/api/external/add-item"
 
 # Services
