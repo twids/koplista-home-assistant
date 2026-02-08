@@ -89,12 +89,11 @@ class KoplistaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 _LOGGER.exception("Unexpected exception during reconfiguration: %s", err)
                 errors["base"] = "unknown"
             else:
-                entry = self.hass.config_entries.async_get_entry(
-                    self.context["entry_id"]
+                # Update the entry and reload the integration
+                return self.async_update_reload_and_abort(
+                    self._get_reconfigure_entry(),
+                    data=user_input,
                 )
-                if entry:
-                    self.hass.config_entries.async_update_entry(entry, data=user_input)
-                return self.async_abort(reason="reconfigure_successful")
 
         return self.async_show_form(
             step_id="reconfigure",
